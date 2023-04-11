@@ -222,4 +222,81 @@ otus> db.less2.find({"Round": 'Jeopardy!'}, {"Question":1, "Answer": 1, "_id": 0
     Answer: 'Jim Thorpe'
   }
 ]
+
+otus> db.less2.find({"Value": {$in: ["$100"]}}, {"Question":1, "Answer": 1, "_id": 0}).limit(4)
+[
+  {
+    Question: `Prime Minister Tony Blair dubbed her "The People's Princess"`,
+    Answer: 'Princess Diana'
+  },
+  {
+    Question: 'Once Tommy Mullaney on "L.A. Law", John Spencer now plays White House chief of staff Leo McGarry on this series',
+    Answer: 'The West Wing'
+  },
+  {
+    Question: "The Cinderella Castle Mystery Tour is a highlight of this Asian city's Disneyland",
+    Answer: 'Tokyo'
+  },
+  {
+    Question: 'This punk rock hitmaker heard here has had numerous hits on both sides of the Atlantic',
+    Answer: 'Billy Idol'
+  }
+]
 ```
+
+## создать индексы и сравнить производительность.
+
+Запрос до создания индекса - <b> 11 ms </b>
+````
+otus> db.less2.find({"Value": {$in: ["$200"]}})
+{
+ "stage": "COLLSCAN",
+ "filter": {
+  "Value": {
+   "$eq": "$200"
+  }
+ },
+ "nReturned": 30455,
+ "executionTimeMillisEstimate": 11,
+ "works": 216932,
+ "advanced": 30455,
+ "needTime": 186476,
+ "needYield": 0,
+ "saveState": 216,
+ "restoreState": 216,
+ "isEOF": 1,
+ "direction": "forward",
+ "docsExamined": 216930
+}
+}
+`````
+
+Cоздаем индекс на поле <b>Value</b>
+````
+otus> db.less2.createIndex({"Value": "text"})
+Value_text
+````
+
+
+После создания индекса запрос выполнился за 8ms
+
+````
+{
+ "stage": "COLLSCAN",
+ "filter": {
+  "Value": {
+   "$eq": "$200"
+  }
+ },
+ "nReturned": 30455,
+ "executionTimeMillisEstimate": 7,
+ "works": 216932,
+ "advanced": 30455,
+ "needTime": 186476,
+ "needYield": 0,
+ "saveState": 216,
+ "restoreState": 216,
+ "isEOF": 1,
+ "direction": "forward",
+ "docsExamined": 216930
+}
