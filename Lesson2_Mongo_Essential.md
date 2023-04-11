@@ -14,8 +14,7 @@ root@mongodb:~# systemctl status mongod
              └─1867 /usr/bin/mongod --config /etc/mongod.conf
 
 Apr 10 17:11:18 mongodb systemd[1]: Started MongoDB Database Server.
-```
-````
+
 db> db.hello()
 {
   isWritablePrimary: true,
@@ -34,7 +33,7 @@ db> db.hello()
   readOnly: false,
   ok: 1
 }
-````
+```
 
 
 ## Заполнить данными
@@ -54,6 +53,173 @@ less2
 
 otus> db.less2.countDocuments()
 216930
+
+otus> db.less2.find().limit(10)
+[
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c3f"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: "ESPN's TOP 10 ALL-TIME ATHLETES",
+    Value: '$200',
+    Question: 'No. 2: 1912 Olympian; football star at Carlisle Indian School; 6 MLB seasons with the Reds, Giants & Braves',
+    Answer: 'Jim Thorpe'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c40"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'EVERYBODY TALKS ABOUT IT...',
+    Value: '$200',
+    Question: 'The city of Yuma in this state has a record average of 4,055 hours of sunshine each year',
+    Answer: 'Arizona'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c41"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'HISTORY',
+    Value: '$200',
+    Question: "For the last 8 years of his life, Galileo was under house arrest for espousing this man's theory",
+    Answer: 'Copernicus'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c42"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'THE COMPANY LINE',
+    Value: '$200',
+    Question: 'In 1963, live on "The Art Linkletter Show", this company served its billionth burger',
+    Answer: "McDonald's"
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c43"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'EPITAPHS & TRIBUTES',
+    Value: '$200',
+    Question: 'Signer of the Dec. of Indep., framer of the Constitution of Mass., second President of the United States',
+    Answer: 'John Adams'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c44"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'HISTORY',
+    Value: '$400',
+    Question: "Built in 312 B.C. to link Rome & the South of Italy, it's still in use today",
+    Answer: 'the Appian Way'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c45"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: "ESPN's TOP 10 ALL-TIME ATHLETES",
+    Value: '$400',
+    Question: 'No. 8: 30 steals for the Birmingham Barons; 2,306 steals for the Bulls',
+    Answer: 'Michael Jordan'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c46"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'EVERYBODY TALKS ABOUT IT...',
+    Value: '$400',
+    Question: 'In the winter of 1971-72, a record 1,122 inches of snow fell at Rainier Paradise Ranger Station in this state',
+    Answer: 'Washington'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c47"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'THE COMPANY LINE',
+    Value: '$400',
+    Question: 'This housewares store was named for the packaging its merchandise came in & was first displayed on',
+    Answer: 'Crate & Barrel'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c48"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: '3-LETTER WORDS',
+    Value: '$200',
+    Question: 'In the title of an Aesop fable, this insect shared billing with a grasshopper',
+    Answer: 'the ant'
+  }
+]
 `````
 
+## Написать несколько запросов на выборку и обновление данных
 
+```
+otus> db.less2.find({"Round": 'Jeopardy!'}).limit(3)
+[
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c3f"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: "ESPN's TOP 10 ALL-TIME ATHLETES",
+    Value: '$200',
+    Question: 'No. 2: 1912 Olympian; football star at Carlisle Indian School; 6 MLB seasons with the Reds, Giants & Braves',
+    Answer: 'Jim Thorpe'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c40"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'EVERYBODY TALKS ABOUT IT...',
+    Value: '$200',
+    Question: 'The city of Yuma in this state has a record average of 4,055 hours of sunshine each year',
+    Answer: 'Arizona'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c41"),
+    'Show Number': 4680,
+    'Air Date': '2004-12-31',
+    Round: 'Jeopardy!',
+    Category: 'HISTORY',
+    Value: '$200',
+    Question: "For the last 8 years of his life, Galileo was under house arrest for espousing this man's theory",
+    Answer: 'Copernicus'
+  }
+]
+
+otus> db.less2.find({"Round": 'Jeopardy!'}, {"Question":1, "Answer": 1}).limit(3)
+[
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c3f"),
+    Question: 'No. 2: 1912 Olympian; football star at Carlisle Indian School; 6 MLB seasons with the Reds, Giants & Braves',
+    Answer: 'Jim Thorpe'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c40"),
+    Question: 'The city of Yuma in this state has a record average of 4,055 hours of sunshine each year',
+    Answer: 'Arizona'
+  },
+  {
+    _id: ObjectId("6434fc771f0e5a2054b16c41"),
+    Question: "For the last 8 years of his life, Galileo was under house arrest for espousing this man's theory",
+    Answer: 'Copernicus'
+  }
+]
+
+otus> db.less2.find({"Round": 'Jeopardy!'}, {"Question":1, "Answer": 1, "_id": 0}).limit(1)
+[
+  {
+    Question: 'No. 2: 1912 Olympian; football star at Carlisle Indian School; 6 MLB seasons with the Reds, Giants & Braves',
+    Answer: 'Jim Thorpe'
+  }
+]
+```
