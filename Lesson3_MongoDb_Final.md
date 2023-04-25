@@ -525,7 +525,8 @@ RScfg [direct: secondary] test> rs.status()
 ```
 
 >Запускаем mongos
-><b>mongodbs</b>
+
+<b>mongodbs</b>
 ```
 sudo mkdir /home/mongo && sudo mkdir /home/mongo/dbs1
 mongos --configdb RScfg/mongodbrs1:27001,mongodbrs2:27001,mongodbrs3:27001 --port 27000 --fork --logpath /home/mongo/dbs1/dbs.log --pidfilepath /home/mongo/dbs1/dbs1.pid --bind_ip_all
