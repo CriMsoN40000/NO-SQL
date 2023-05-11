@@ -801,5 +801,360 @@ switched to db config
   }
   ...
  ````
-### Поронять разные инстансы, посмотреть, что будет происходить, поднять обратно. Описать что произошло.
-### Настроить аутентификацию и многоролевой доступ;
+ 
+### 3. Поронять разные инстансы, посмотреть, что будет происходить, поднять обратно. Описать что произошло.
+
+> Остановим праймари для репликасета RS1
+````
+RS1 [direct: primary] bank> rs.status()
+{
+  set: 'RS1',
+  date: ISODate("2023-05-11T06:29:10.445Z"),
+  myState: 1,
+  term: Long("4"),
+  syncSourceHost: '',
+  syncSourceId: -1,
+  heartbeatIntervalMillis: Long("2000"),
+  majorityVoteCount: 2,
+  writeMajorityCount: 2,
+  votingMembersCount: 3,
+  writableVotingMembersCount: 3,
+  optimes: {
+    lastCommittedOpTime: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+    lastCommittedWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+    readConcernMajorityOpTime: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+    appliedOpTime: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+    durableOpTime: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+    lastAppliedWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+    lastDurableWallTime: ISODate("2023-05-11T06:29:08.557Z")
+  },
+  lastStableRecoveryTimestamp: Timestamp({ t: 1683786498, i: 1 }),
+  electionCandidateMetrics: {
+    lastElectionReason: 'priorityTakeover',
+    lastElectionDate: ISODate("2023-05-11T05:32:58.406Z"),
+    electionTerm: Long("4"),
+    lastCommittedOpTimeAtElection: { ts: Timestamp({ t: 1683783176, i: 1 }), t: Long("3") },
+    lastSeenOpTimeAtElection: { ts: Timestamp({ t: 1683783176, i: 1 }), t: Long("3") },
+    numVotesNeeded: 2,
+    priorityAtElection: 3,
+    electionTimeoutMillis: Long("10000"),
+    priorPrimaryMemberId: 1,
+    numCatchUpOps: Long("0"),
+    newTermStartDate: ISODate("2023-05-11T05:32:58.417Z"),
+    wMajorityWriteAvailabilityDate: ISODate("2023-05-11T05:32:59.423Z")
+  },
+  electionParticipantMetrics: {
+    votedForCandidate: true,
+    electionTerm: Long("3"),
+    lastVoteDate: ISODate("2023-05-11T05:32:46.895Z"),
+    electionCandidateMemberId: 1,
+    voteReason: '',
+    lastAppliedOpTimeAtElection: { ts: Timestamp({ t: 1682406477, i: 1 }), t: Long("2") },
+    maxAppliedOpTimeInSet: { ts: Timestamp({ t: 1682406477, i: 1 }), t: Long("2") },
+    priorityAtElection: 3
+  },
+  members: [
+    {
+      _id: 0,
+      name: 'mongodbrs1:27011',
+      health: 1,
+      state: 1,
+      stateStr: 'PRIMARY',
+      uptime: 3466,
+      optime: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+      optimeDate: ISODate("2023-05-11T06:29:08.000Z"),
+      lastAppliedWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+      lastDurableWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+      syncSourceHost: '',
+      syncSourceId: -1,
+      infoMessage: '',
+      electionTime: Timestamp({ t: 1683783178, i: 2 }),
+      electionDate: ISODate("2023-05-11T05:32:58.000Z"),
+      configVersion: 4,
+      configTerm: 4,
+      self: true,
+      lastHeartbeatMessage: ''
+    },
+    {
+      _id: 1,
+      name: 'mongodbrs2:27011',
+      health: 1,
+      state: 2,
+      stateStr: 'SECONDARY',
+      uptime: 3393,
+      optime: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+      optimeDurable: { ts: Timestamp({ t: 1683786548, i: 1 }), t: Long("4") },
+      optimeDate: ISODate("2023-05-11T06:29:08.000Z"),
+      optimeDurableDate: ISODate("2023-05-11T06:29:08.000Z"),
+      lastAppliedWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+      lastDurableWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+      lastHeartbeat: ISODate("2023-05-11T06:29:09.657Z"),
+      lastHeartbeatRecv: ISODate("2023-05-11T06:29:09.316Z"),
+      pingMs: Long("0"),
+      lastHeartbeatMessage: '',
+      syncSourceHost: 'mongodbrs1:27011',
+      syncSourceId: 0,
+      infoMessage: '',
+      configVersion: 4,
+      configTerm: 4
+    },
+    {
+      _id: 2,
+      name: 'mongodbrs3:27011',
+      health: 1,
+      state: 2,
+      stateStr: 'SECONDARY',
+      uptime: 3287,
+      optime: { ts: Timestamp({ t: 1683786538, i: 2 }), t: Long("4") },
+      optimeDurable: { ts: Timestamp({ t: 1683786538, i: 2 }), t: Long("4") },
+      optimeDate: ISODate("2023-05-11T06:28:58.000Z"),
+      optimeDurableDate: ISODate("2023-05-11T06:28:58.000Z"),
+      lastAppliedWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+      lastDurableWallTime: ISODate("2023-05-11T06:29:08.557Z"),
+      lastHeartbeat: ISODate("2023-05-11T06:29:08.558Z"),
+      lastHeartbeatRecv: ISODate("2023-05-11T06:29:09.723Z"),
+      pingMs: Long("0"),
+      lastHeartbeatMessage: '',
+      syncSourceHost: 'mongodbrs2:27011',
+      syncSourceId: 1,
+      infoMessage: '',
+      configVersion: 4,
+      configTerm: 4
+    }
+  ],
+  ok: 1,
+  lastCommittedOpTime: Timestamp({ t: 1683786548, i: 1 }),
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683786548, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683786548, i: 1 })
+}
+
+root@mongodbrs2:~# mongosh --port 27011
+RS1 [direct: primary] test> rs.status()
+{
+  set: 'RS1',
+  date: ISODate("2023-05-11T06:30:55.604Z"),
+  myState: 1,
+  term: Long("5"),
+  syncSourceHost: '',
+  syncSourceId: -1,
+  heartbeatIntervalMillis: Long("2000"),
+  majorityVoteCount: 2,
+  writeMajorityCount: 2,
+  votingMembersCount: 3,
+  writableVotingMembersCount: 3,
+  optimes: {
+    lastCommittedOpTime: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+    lastCommittedWallTime: ISODate("2023-05-11T06:30:52.399Z"),
+    readConcernMajorityOpTime: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+    appliedOpTime: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+    durableOpTime: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+    lastAppliedWallTime: ISODate("2023-05-11T06:30:52.399Z"),
+    lastDurableWallTime: ISODate("2023-05-11T06:30:52.399Z")
+  },
+  lastStableRecoveryTimestamp: Timestamp({ t: 1683786632, i: 1 }),
+  electionCandidateMetrics: {
+    lastElectionReason: 'stepUpRequestSkipDryRun',
+    lastElectionDate: ISODate("2023-05-11T06:30:02.347Z"),
+    electionTerm: Long("5"),
+    lastCommittedOpTimeAtElection: { ts: Timestamp({ t: 1683786598, i: 2 }), t: Long("4") },
+    lastSeenOpTimeAtElection: { ts: Timestamp({ t: 1683786598, i: 2 }), t: Long("4") },
+    numVotesNeeded: 2,
+    priorityAtElection: 1,
+    electionTimeoutMillis: Long("10000"),
+    priorPrimaryMemberId: 0,
+    numCatchUpOps: Long("0"),
+    newTermStartDate: ISODate("2023-05-11T06:30:02.383Z"),
+    wMajorityWriteAvailabilityDate: ISODate("2023-05-11T06:30:02.408Z")
+  },
+  electionParticipantMetrics: {
+    votedForCandidate: true,
+    electionTerm: Long("4"),
+    lastVoteDate: ISODate("2023-05-11T05:32:58.408Z"),
+    electionCandidateMemberId: 0,
+    voteReason: '',
+    lastAppliedOpTimeAtElection: { ts: Timestamp({ t: 1683783176, i: 1 }), t: Long("3") },
+    maxAppliedOpTimeInSet: { ts: Timestamp({ t: 1683783176, i: 1 }), t: Long("3") },
+    priorityAtElection: 1
+  },
+  members: [
+    {
+      _id: 0,
+      name: 'mongodbrs1:27011',
+      health: 0,
+      state: 8,
+      stateStr: '(not reachable/healthy)',
+      uptime: 0,
+      optime: { ts: Timestamp({ t: 0, i: 0 }), t: Long("-1") },
+      optimeDurable: { ts: Timestamp({ t: 0, i: 0 }), t: Long("-1") },
+      optimeDate: ISODate("1970-01-01T00:00:00.000Z"),
+      optimeDurableDate: ISODate("1970-01-01T00:00:00.000Z"),
+      lastAppliedWallTime: ISODate("2023-05-11T06:30:12.398Z"),
+      lastDurableWallTime: ISODate("2023-05-11T06:30:12.398Z"),
+      lastHeartbeat: ISODate("2023-05-11T06:30:52.437Z"),
+      lastHeartbeatRecv: ISODate("2023-05-11T06:30:15.490Z"),
+      pingMs: Long("0"),
+      lastHeartbeatMessage: "Couldn't get a connection within the time limit",
+      syncSourceHost: '',
+      syncSourceId: -1,
+      infoMessage: '',
+      configVersion: 4,
+      configTerm: 5
+    },
+    {
+      _id: 1,
+      name: 'mongodbrs2:27011',
+      health: 1,
+      state: 1,
+      stateStr: 'PRIMARY',
+      uptime: 3502,
+      optime: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+      optimeDate: ISODate("2023-05-11T06:30:52.000Z"),
+      lastAppliedWallTime: ISODate("2023-05-11T06:30:52.399Z"),
+      lastDurableWallTime: ISODate("2023-05-11T06:30:52.399Z"),
+      syncSourceHost: '',
+      syncSourceId: -1,
+      infoMessage: '',
+      electionTime: Timestamp({ t: 1683786602, i: 1 }),
+      electionDate: ISODate("2023-05-11T06:30:02.000Z"),
+      configVersion: 4,
+      configTerm: 5,
+      self: true,
+      lastHeartbeatMessage: ''
+    },
+    {
+      _id: 2,
+      name: 'mongodbrs3:27011',
+      health: 1,
+      state: 2,
+      stateStr: 'SECONDARY',
+      uptime: 3394,
+      optime: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+      optimeDurable: { ts: Timestamp({ t: 1683786652, i: 1 }), t: Long("5") },
+      optimeDate: ISODate("2023-05-11T06:30:52.000Z"),
+      optimeDurableDate: ISODate("2023-05-11T06:30:52.000Z"),
+      lastAppliedWallTime: ISODate("2023-05-11T06:30:52.399Z"),
+      lastDurableWallTime: ISODate("2023-05-11T06:30:52.399Z"),
+      lastHeartbeat: ISODate("2023-05-11T06:30:54.423Z"),
+      lastHeartbeatRecv: ISODate("2023-05-11T06:30:54.422Z"),
+      pingMs: Long("0"),
+      lastHeartbeatMessage: '',
+      syncSourceHost: 'mongodbrs2:27011',
+      syncSourceId: 1,
+      infoMessage: '',
+      configVersion: 4,
+      configTerm: 5
+    }
+  ],
+  ok: 1,
+  lastCommittedOpTime: Timestamp({ t: 1683786652, i: 1 }),
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683786652, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683786652, i: 1 })
+}
+
+````
+
+Видим,что праймари переехал на mongodbrs2, а mongodbrs1 стал **not reachable/healthy**
+
+
+### 4. Настроить аутентификацию и многоролевой доступ
+> Создадим отдельный инстанс и проведем настройку на нем
+
+````
+root@mongodbs:~# sudo mkdir /home/mongo/db15 && sudo chmod 777 /home/mongo/db15
+root@mongodbs:~# mongod --dbpath /home/mongo/db15 --port 27005 --fork --logpath /home/mongo/db15/db5.log --pidfilepath /home/mongo/db15/db5.pid --bind_ip_all
+about to fork child process, waiting until server is ready for connections.
+forked process: 1488
+child process started successfully, parent exiting
+root@mongodbs:~# mongo --port 27005
+> db.createRole(
+...     {      
+...      role: "superRoot",      
+...      privileges:[
+...         { resource: {anyResource:true}, actions: ["anyAction"]}
+...      ],      
+...      roles:[] 
+...     }
+... )
+{
+        "role" : "superRoot",
+        "privileges" : [
+                {
+                        "resource" : {
+                                "anyResource" : true
+                        },
+                        "actions" : [
+                                "anyAction"
+                        ]
+                }
+        ],
+        "roles" : [ ]
+}
+
+> db.createUser({      
+...      user: "companyDBA",      
+...      pwd: "EWqeeFpUt",      
+...      roles: ["superRoot"],
+...      passwordDigestor:"server"
+... })
+Successfully added user: {
+        "user" : "companyDBA",
+        "roles" : [
+                "superRoot"
+        ],
+        "passwordDigestor" : "server"
+}
+
+
+> db.system.roles.find()
+{ "_id" : "admin.superRoot", "role" : "superRoot", "db" : "admin", "privileges" : [ { "resource" : { "anyResource" : true }, "actions" : [ "anyAction" ] } ], "roles" : [ ] }
+
+> db.system.users.find()
+{ "_id" : "admin.companyDBA", "userId" : UUID("8acef635-2743-4875-9bd9-f90e02fd9e93"), "user" : "companyDBA", "db" : "admin", "credentials" : { "SCRAM-SHA-1" : { "iterationCount" : 10000, "salt" : "tueG/w59wwUqACVzXqRUNA==", "storedKey" : "GV2+pk/sboFgzStPJ21+Mo7K9MA=", "serverKey" : "FgUhs3kClfaRdlLNVteD9f7i8/Y=" }, "SCRAM-SHA-256" : { "iterationCount" : 15000, "salt" : "uBSaYpp1FNid6XQesm2CkqaIDVNMOXco52SqKw==", "storedKey" : "skVKJKpUUG74Yai4FwZV/zAPDoz1zI5DrPu8hx4Ka6w=", "serverKey" : "Q51vN3OVIXjHKKMqtSxFDKT0LKNrStwIn1yUJKErppg=" } }, "roles" : [ { "role" : "superRoot", "db" : "admin" } ] }
+````
+> Запустим с включенным режимом аутентификации
+````
+mongod --dbpath /home/mongo/db15 --port 27005 --auth --fork --logpath /home/mongo/db15/db5.log --pidfilepath /home/mongo/db15/db5.pid
+
+root@mongodbrs1:/home/mongo/db15# mongo --port 27006
+MongoDB shell version v3.6.8
+connecting to: mongodb://127.0.0.1:27005/
+Implicit session: session { "id" : UUID("758fa844-2c57-4cc0-8728-4715dcadc5d1") }
+MongoDB server version: 3.6.8
+> db.system.users.find()
+Error: error: {
+        "ok" : 0,
+        "errmsg" : "there are no users authenticated",
+        "code" : 13,
+        "codeName" : "Unauthorized"
+}
+
+root@mongodbrs1:/home/mongo/db15# mongo --port 27006 -u companyDBA -p EWqeeFpUt --authenticationDatabase "admin"
+MongoDB shell version v3.6.8
+connecting to: mongodb://127.0.0.1:27006/
+Implicit session: session { "id" : UUID("84d21849-528b-45fe-9f9e-638a4754864d") }
+MongoDB server version: 3.6.8
+Server has startup warnings: 
+2023-05-11T07:05:18.523+0000 I STORAGE  [initandlisten] 
+2023-05-11T07:05:18.523+0000 I STORAGE  [initandlisten] ** WARNING: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine
+2023-05-11T07:05:18.523+0000 I STORAGE  [initandlisten] **          See http://dochub.mongodb.org/core/prodnotes-filesystem
+2023-05-11T07:05:19.633+0000 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2023-05-11T07:05:19.633+0000 I CONTROL  [initandlisten] 
+> show databases
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+
+
+````
