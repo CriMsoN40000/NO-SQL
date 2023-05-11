@@ -607,6 +607,199 @@ databases
 
 
 
-### Добавить балансировку, нагрузить данными, выбрать хороший ключ шардирования, посмотреть как данные перебалансируются между шардами;
+### 2. Добавить балансировку, нагрузить данными, выбрать хороший ключ шардирования, посмотреть как данные перебалансируются между шардами;
+
+> Выполняем добавление новой БД и коллекции со случайными данными на mongodbs
+```
+[direct: mongos] admin> use bank
+switched to db bank
+[direct: mongos] bank> sh.enableSharding("bank")
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683784601, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683784601, i: 1 })
+}
+[direct: mongos] bank> use config
+switched to db config
+[direct: mongos] config> db.settings.updateOne(
+...    { _id: "chunksize" },
+...    { $set: { _id: "chunksize", value: 1 } },
+...    { upsert: true }
+... )
+{
+  acknowledged: true,
+  insertedId: 'chunksize',
+  matchedCount: 0,
+  modifiedCount: 0,
+  upsertedCount: 1
+}
+[direct: mongos] config> use bank
+switched to db bank
+[direct: mongos] bank> for (var i=0; i<50000; i++) { db.tickets.insert({name: "Max ammout of cost tickets", amount: Math.random()*100}) }
+DeprecationWarning: Collection.insert() is deprecated. Use insertOne, insertMany, or bulkWrite.
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId("645c85281f5b841aa1541a0f") }
+}
+[direct: mongos] bank> db.tickets.createIndex({amount: 1})
+amount_1
+ 
+direct: mongos] bank> use admin
+switched to db admin
+[direct: mongos] admin> db.runCommand({shardCollection: "bank.tickets", key: {amount: 1}})
+{
+  collectionsharded: 'bank.tickets',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683785163, i: 10 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683785163, i: 6 })
+}
+sh.status()
+...
+collections: {
+      'bank.tickets': {
+        shardKey: { amount: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [ { shard: 'RS2', nChunks: 1 }, { shard: 'RS3', nChunks: 1 } ],
+        chunks: [
+          { min: { amount: MinKey() }, max: { amount: 28.141677578987622 }, 'on shard': 'RS3', 'last modified': Timestamp({ t: 2, i: 0 }) },
+          { min: { amount: 28.141677578987622 }, max: { amount: MaxKey() }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 1 }) }
+        ],
+        tags: []
+      }
+    }
+ 
+[direct: mongos] admin> sh.balancerCollectionStatus("bank.tickets")
+{
+  chunkSize: 1,
+  balancerCompliant: true,
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683785269, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683785269, i: 1 })
+}
+```
+> Разделим чанки
+```
+[direct: mongos] admin> sh.splitFind( "bank.tickets", { "amount": "50" } )
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683785436, i: 5 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683785436, i: 4 })
+}
+
+[direct: mongos] admin> sh.status()
+...
+collections: {
+      'bank.tickets': {
+        shardKey: { amount: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [ { shard: 'RS2', nChunks: 3 }, { shard: 'RS3', nChunks: 1 } ],
+        chunks: [
+          { min: { amount: MinKey() }, max: { amount: 28.141677578987622 }, 'on shard': 'RS3', 'last modified': Timestamp({ t: 2, i: 0 }) },
+          { min: { amount: 28.141677578987622 }, max: { amount: 64.19224381416981 }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 2 }) },
+          { min: { amount: 64.19224381416981 }, max: { amount: 82.17083678216588 }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 4 }) },
+          { min: { amount: 82.17083678216588 }, max: { amount: MaxKey() }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 5 }) }
+        ],
+        tags: []
+      }
+    }
+...
+```
+> Настраиваем балансер
+````
+[direct: mongos] admin> sh.getBalancerState()
+true
+[direct: mongos] admin> sh.isBalancerRunning()
+{
+  mode: 'full',
+  inBalancerRound: false,
+  numBalancerRounds: Long("260"),
+  term: Long("3"),
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683785806, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683785806, i: 1 })
+}
+
+[direct: mongos] admin> use config
+switched to db config
+
+[direct: mongos] config> sh.startBalancer()
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1683785833, i: 3 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1683785833, i: 3 })
+}
+````
+> Настроим окно активности
+````
+[direct: mongos] config> db.settings.updateOne(
+...    { _id: "balancer" },
+...    { $set: { activeWindow : { start : "00:00", stop : "23:59" } } },
+...    { upsert: true }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+[direct: mongos] config> sh.status()
+...
+    collections: {
+      'bank.tickets': {
+        shardKey: { amount: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [ { shard: 'RS2', nChunks: 3 }, { shard: 'RS3', nChunks: 1 } ],
+        chunks: [
+          { min: { amount: MinKey() }, max: { amount: 28.141677578987622 }, 'on shard': 'RS3', 'last modified': Timestamp({ t: 2, i: 0 }) },
+          { min: { amount: 28.141677578987622 }, max: { amount: 64.19224381416981 }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 2 }) },
+          { min: { amount: 64.19224381416981 }, max: { amount: 82.17083678216588 }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 4 }) },
+          { min: { amount: 82.17083678216588 }, max: { amount: MaxKey() }, 'on shard': 'RS2', 'last modified': Timestamp({ t: 2, i: 5 }) }
+        ],
+        tags: []
+      }
+    }
+  }
+  ...
+ ````
 ### Поронять разные инстансы, посмотреть, что будет происходить, поднять обратно. Описать что произошло.
 ### Настроить аутентификацию и многоролевой доступ;
